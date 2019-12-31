@@ -4,7 +4,7 @@ from urllib.parse import urlparse, quote, unquote
 
 from core.arjun import arjun
 from core.checker import checker
-from core.colors import good, bad, end, info, green, red, que
+from core.colors import end, green, que
 import core.config
 from core.config import xsschecker, minEfficiency
 from core.dom import dom
@@ -32,19 +32,10 @@ def scan(target, paramData, encoding, headers, delay, timeout, skipDOM, find, sk
     logger.debug('Scan target: {}'.format(target))
     response = requester(target, {}, headers, GET, delay, timeout).text
 
-    if not skipDOM:
-        logger.run('Checking for DOM vulnerabilities')
-        highlighted = dom(response)
-        if highlighted:
-            logger.good('Potentially vulnerable objects found')
-            logger.red_line(level='good')
-            for line in highlighted:
-                logger.no_format(line, level='good')
-            logger.red_line(level='good')
     host = urlparse(target).netloc  # Extracts host out of the url
     logger.debug('Host to scan: {}'.format(host))
     url = getUrl(target, GET)
-    logger.debug('Url to scan: {}'.format(url))
+    logger.debug('URL to scan: {}'.format(url))
     params = getParams(target, paramData, GET)
     logger.debug_json('Scan parameters:', params)
     if find:
@@ -58,6 +49,15 @@ def scan(target, paramData, encoding, headers, delay, timeout, skipDOM, find, sk
         logger.error('WAF detected: %s%s%s' % (green, WAF, end))
     else:
         logger.good('WAF Status: %sOffline%s' % (green, end))
+    if not skipDOM:
+        logger.run('Checking for DOM vulnerabilities')
+        highlighted = dom(response, params)
+        if highlighted:
+            logger.good('Potentially vulnerable objects found')
+            logger.red_line(level='good')
+            for line in highlighted:
+                logger.no_format(line, level='good')
+            logger.red_line(level='good')
 
     for paramName in params.keys():
         paramsCopy = copy.deepcopy(params)

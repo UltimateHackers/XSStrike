@@ -1,3 +1,10 @@
+### 3.1.6
+- Add request parameters as sources for the DOM-based XSS checker
+
+### 3.1.5
+- Fix color bug that resulted in DOM XSS vulnerabilities not
+  being reported on certain systems (Windows, macOS, iOS)
+
 ### 3.1.4
 - Negligible DOM XSS false positives
 - x10 Faster crawling by
